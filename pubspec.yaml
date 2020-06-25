@@ -1,0 +1,56 @@
+name: archo
+description: A Flutter architecture template.
+
+publish_to: 'https://github.com/sad1996/archo'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.3
+  get: ^2.14.1
+  provider: ^4.1.3
+  connectivity: ^0.4.8+6
+  dio: ^3.0.9
+  dio_http_cache: ^0.2.7
+  intl: ^0.16.1
+  hive: ^1.4.1+1
+  hive_flutter: ^0.3.0+2
+  dio_retry: ^0.1.9-beta
+  url_launcher: ^5.4.11
+  package_info: ^0.4.1
+  google_fonts: ^1.1.0
+  build_context: ^2.0.2
+
+dependency_overrides:
+  path: 1.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
