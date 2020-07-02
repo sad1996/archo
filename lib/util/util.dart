@@ -6,7 +6,6 @@ import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -32,12 +31,18 @@ class Util {
     dioCacheManager.clearExpired();
   }
 
+  static ThemeData get appTheme =>
+      Hive.box("theme_box").get("theme", defaultValue: "light") == "light"
+          ? lightTheme
+          : darkTheme;
+
   //Customize your theme here
   static ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       primarySwatch: Colors.blueGrey,
       primaryColor: Colors.black,
+      accentColor: Colors.blue,
       backgroundColor: Colors.blueGrey,
       scaffoldBackgroundColor: Colors.blueGrey.shade900,
       fontFamily: GoogleFonts.rubik().fontFamily);
@@ -47,6 +52,7 @@ class Util {
       visualDensity: VisualDensity.adaptivePlatformDensity,
       primarySwatch: Colors.blueGrey,
       primaryColor: Colors.blueGrey.shade900,
+      accentColor: Colors.blue,
       backgroundColor: Colors.white,
       scaffoldBackgroundColor: Colors.white,
       fontFamily: GoogleFonts.rubik().fontFamily);
@@ -64,11 +70,5 @@ class Util {
       return SlideLeftRoute(
         page: page,
       );
-  }
-}
-
-class MiddleWare {
-  static observer(Routing routing) {
-    if (!routing.isSnackbar) printIfDebug("Route: " + routing.current);
   }
 }

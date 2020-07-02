@@ -1,3 +1,5 @@
+import 'package:archo/controller/api.dart';
+import 'package:archo/provider/home_provider.dart';
 import 'package:archo/widget/no_internet.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
@@ -22,6 +24,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AppProvider(context)),
         ChangeNotifierProvider(create: (context) => ConnectivityProvider()),
+        ChangeNotifierProvider(create: (context) => HomeProvider()),
       ],
       child: MyApp(),
     ),
@@ -62,7 +65,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    //In case if you need something from app provider (i.e. Login Verification)
     var appProvider = Provider.of<AppProvider>(context, listen: false);
 
     return Directionality(
@@ -72,31 +74,44 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             ValueListenableBuilder<Box>(
               valueListenable: Hive.box('theme_box').listenable(),
-              builder: (context, box, child) => MaterialApp(
-                title: 'Flutter Archo',
-                debugShowCheckedModeBanner: false,
-                navigatorKey: Get.key,
-                navigatorObservers: [
-                  GetObserver(MiddleWare.observer),
-                ],
-                theme: box.get("theme", defaultValue: "light") == "light"
-                    ? Util.lightTheme
-                    : Util.darkTheme,
-                routes: {
-                  HomePage.routeName: (context) => HomePage(),
-                  SettingsPage.routeName: (context) => SettingsPage(),
-                },
-                onGenerateRoute: (settings) {
-                  switch (settings.name) {
-                    case HomePage.routeName:
-                      return Util.platformRoute(
-                          page: SettingsPage(), isDialog: true);
-                      break;
-                  }
-                  return null;
-                },
-                initialRoute: HomePage.routeName,
-              ),
+              builder: (context, box, child) {
+                printIfDebug("App Releaded");
+                return GetMaterialApp(
+                  title: 'Flutter Archo',
+                  debugShowCheckedModeBanner: false,
+                  theme: box.get("theme", defaultValue: "light") == "light"
+                      ? Util.lightTheme
+                      : Util.darkTheme,
+                  getPages: [
+                    GetPage(
+                        name: HomePage.routeName,
+                        page: () => HomePage(),
+                        transition: Transition.rightToLeft),
+                    GetPage(
+                        name: SettingsPage.routeName,
+                        page: () => SettingsPage(),
+                        transition: Transition.rightToLeft),
+                  ],
+                  routes: {
+                    HomePage.routeName: (context) => HomePage(),
+                    SettingsPage.routeName: (context) => SettingsPage(),
+                  },
+                  routingCallback: (routing) {
+                    if (!routing.isSnackbar)
+                      printIfDebug("Route: " + routing.current);
+                  },
+//                onGenerateRoute: (settings) {
+//                  switch (settings.name) {
+//                    case HomePage.routeName:
+//                      return Util.platformRoute(
+//                          page: SettingsPage(), isDialog: true);
+//                      break;
+//                  }
+//                  return null;
+//                },
+                  initialRoute: HomePage.routeName,
+                );
+              },
             ),
             Consumer<ConnectivityProvider>(
                 builder: (context, connectivity, _) =>

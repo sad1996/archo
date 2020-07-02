@@ -7,7 +7,7 @@ var themeBox = Hive.box("theme_box");
 
 // if dark true else false
 Widget get themeSwitcher => CupertinoSwitch(
-    value: themeBox.get("theme") == "dark",
+    value: themeBox.get("theme", defaultValue: "light") == "dark",
     onChanged: (value) {
       var theme = value ? "dark" : "light";
       themeBox.put("theme", theme);

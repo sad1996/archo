@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:archo/util/util.dart';
 import 'package:dio/dio.dart';
@@ -28,16 +27,18 @@ class Api {
 
   // URLs SECTION ---------------------------- //
 
-  static String get baseUrl => 'https://www.example.com/';
+  static String get baseUrl => 'https://gorest.co.in/';
 
-  static String get loginUrl => 'api/app_login';
+  static String get usersUrl =>
+      'public-api/users?_format=json&access-token=HajwM0zViUmD3bTUu9uEizfyuCIBcKnsmp6H';
 
   static String get anotherUrl => 'api/another_url';
 
   // API CALLS SECTION ---------------------------- //
 
-  static Future<Map> getApiExample({String packId = ''}) async {
-    return dioGet(loginUrl, apiInfo: "Get Sticker Pack");
+  static Future<Map> getApiExample(
+      {String packId = '', bool forceRefresh = false}) async {
+    return dioGet(usersUrl, apiInfo: "Get Users");
   }
 
   static Future<Map> anotherGetApiExample(
@@ -48,8 +49,10 @@ class Api {
           forceRefresh: forceRefresh,
           apiInfo: "Get Another Api");
 
-  static Future<Map> postApiExample(Map<String, dynamic> data) async =>
-      await dioPost(anotherUrl, data, apiInfo: 'Post API Example');
+  static Future<Map> postApiExample(Map<String, dynamic> data,
+          {bool forceRefresh = false}) async =>
+      await dioPost(anotherUrl, data,
+          forceRefresh: forceRefresh, apiInfo: 'Post API Example');
 
   static Future<Map> anotherPostApiExample(Map<String, dynamic> data,
           {Map<String, dynamic> queryParams = const {},
@@ -85,7 +88,7 @@ class Api {
       options: options,
     );
     printIfDebug("$apiInfo Response: ${response.data.toString()}");
-    return jsonDecode(response.data);
+    return response.data is Map ? response.data : jsonDecode(response.data);
   }
 
   static Future<Map> dioPost(String urlPath, Map<String, dynamic> data,
@@ -97,7 +100,9 @@ class Api {
     printIfDebug("QUERY_PARAMS: " + queryParams.toString());
     printIfDebug("POST_DATA: " + data.toString());
 
-    var options = Options(headers: getHeaders);
+    var options =
+        buildCacheOptions(Duration(days: 1), forceRefresh: forceRefresh)
+            .merge(headers: getHeaders);
 
     printIfDebug("HEADERS: " + options.headers.toString());
     Response response = await dio.post(
@@ -110,14 +115,14 @@ class Api {
       },
     );
     printIfDebug("$apiInfo Response: ${response.data.toString()}");
-    return jsonDecode(response.data);
+    return response.data is Map ? response.data : jsonDecode(response.data);
   }
 
   static Future dioDownload(String url, String path, ProgressCallback callback,
       {Map<String, dynamic> queryParams = const {},
       bool forceRefresh = false}) async {
     printIfDebug("DOWNLOAD_URL: " + url);
-    var options = Options(headers: await getHeaders);
+    var options = Options(headers: getHeaders);
 
     printIfDebug("HEADERS: " + options.headers.toString());
     await dio.download(url, path,
