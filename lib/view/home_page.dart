@@ -5,6 +5,7 @@ import 'package:archo/widget/user_shimmer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lazy_loading_list/lazy_loading_list.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -36,35 +37,65 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Consumer<HomeProvider>(
-        builder: (_, home, __) => home.users != null
-            ? CupertinoPageScaffold(
-                child: CustomScrollView(
-                  slivers: [
-                    CupertinoSliverRefreshControl(
+        builder: (_, home, __) {
+          if (home.users != null) if (!home.isLoading &&
+              home.users.length > 0) {
+            return CupertinoPageScaffold(
+              child: CustomScrollView(
+                slivers: [
+                  CupertinoSliverRefreshControl(
                       refreshIndicatorExtent: 50,
-                        onRefresh: () => home.getUsers(forceRefresh: true)),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        User user = home.users[index];
-
-                        return ListTile(
-                          onTap: () {},
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(user.avatar),
-                          ),
-                          title: Text(
-                            user.firstName + " " + user.lastName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Text(user.email),
-                        );
-                      }, childCount: home.users.length),
-                    ),
-                  ],
-                ),
-              )
-            : UserShimmer(),
+                      onRefresh: () => home.getUsers(forceRefresh: true)),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      User user = home.users[index];
+                      return LazyLoadingList(
+                        key: ValueKey(user),
+                        index: index,
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {},
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(user.avatar),
+                              ),
+                              title: Text(
+                                user.firstName + " " + user.lastName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(user.email),
+                            ),
+                            Divider(
+                              height: 0.5,
+                              indent: 16,
+                              endIndent: 16,
+                            )
+                          ],
+                        ),
+                        loadMore: () {},
+                        hasMore: true,
+                      );
+                    }, childCount: home.users.length),
+                  ),
+                  if (home.isLoadingMore)
+                    SliverToBoxAdapter(
+                      child: UserShimmer(
+                        length: 1,
+                      ),
+                    )
+                ],
+              ),
+            );
+          } else {
+            return UserShimmer();
+          }
+          else
+            return Container(
+              alignment: Alignment.center,
+              child: Text('Go to the Settings and trigger User Api'),
+            );
+        },
       ),
     );
   }

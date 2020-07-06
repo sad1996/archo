@@ -77,3 +77,71 @@ class EnumValues<T> {
     return reverseMap;
   }
 }
+
+class Meta {
+  Meta({
+    this.success,
+    this.code,
+    this.message,
+    this.totalCount,
+    this.pageCount,
+    this.currentPage,
+    this.perPage,
+    this.rateLimit,
+  });
+
+  bool success;
+  int code;
+  String message;
+  int totalCount;
+  int pageCount;
+  int currentPage;
+  int perPage;
+  RateLimit rateLimit;
+
+  factory Meta.fromJson(Map<String, dynamic> json) => Meta(
+    success: json["success"],
+    code: json["code"],
+    message: json["message"],
+    totalCount: json["totalCount"],
+    pageCount: json["pageCount"],
+    currentPage: json["currentPage"],
+    perPage: json["perPage"],
+    rateLimit: RateLimit.fromJson(json["rateLimit"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "code": code,
+    "message": message,
+    "totalCount": totalCount,
+    "pageCount": pageCount,
+    "currentPage": currentPage,
+    "perPage": perPage,
+    "rateLimit": rateLimit.toJson(),
+  };
+}
+
+class RateLimit {
+  RateLimit({
+    this.limit,
+    this.remaining,
+    this.reset,
+  });
+
+  int limit;
+  int remaining;
+  int reset;
+
+  factory RateLimit.fromJson(Map<String, dynamic> json) => RateLimit(
+    limit: json["limit"],
+    remaining: json["remaining"],
+    reset: json["reset"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "limit": limit,
+    "remaining": remaining,
+    "reset": reset,
+  };
+}

@@ -25,19 +25,19 @@ printFullResponse(statement) {
 class Api {
   Api();
 
-  // URLs SECTION ---------------------------- //
+  // URLs ---------------------------- //
 
   static String get baseUrl => 'https://gorest.co.in/';
 
   static String get usersUrl =>
-      'public-api/users?_format=json&access-token=HajwM0zViUmD3bTUu9uEizfyuCIBcKnsmp6H';
+      'public-api/users?_format=json&access-token=HajwM0zViUmD3bTUu9uEizfyuCIBcKnsmp6H&page=2';
 
   static String get anotherUrl => 'api/another_url';
 
-  // API CALLS SECTION ---------------------------- //
+  // API METHODS ---------------------------- //
 
   static Future<Map> getApiExample(
-      {String packId = '', bool forceRefresh = false}) async {
+      {int page = 0, bool forceRefresh = false}) async {
     return dioGet(usersUrl, apiInfo: "Get Users");
   }
 
@@ -62,7 +62,7 @@ class Api {
           forceRefresh: forceRefresh,
           apiInfo: "Post Another Api");
 
-  // DIO METHODS SECTION ---------------------------- //
+  // DIO METHODS ---------------------------- //
 
   static Map<String, dynamic> get getHeaders =>
       {"api_key": "", "authorization": ""};
