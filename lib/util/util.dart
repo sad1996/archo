@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:archo/controller/dio_retry.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
+import 'package:dio_retry/dio_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/services.dart';
@@ -45,7 +48,7 @@ class Util {
       accentColor: Colors.blue,
       backgroundColor: Colors.blueGrey,
       scaffoldBackgroundColor: Colors.blueGrey.shade900,
-      fontFamily: GoogleFonts.rubik().fontFamily);
+      fontFamily: "PublicSans");
 
   static ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,
@@ -55,7 +58,7 @@ class Util {
       accentColor: Colors.blue,
       backgroundColor: Colors.white,
       scaffoldBackgroundColor: Colors.white,
-      fontFamily: GoogleFonts.rubik().fontFamily);
+      fontFamily: "PublicSans");
 
   static String capitalize(String name) {
     assert(name != null && name.isNotEmpty);
@@ -70,5 +73,27 @@ class Util {
       return SlideLeftRoute(
         page: page,
       );
+  }
+
+  static initDio(BuildContext context) {
+    dio.interceptors.addAll([
+      dioCacheManager.interceptor,
+      RetryOnConnectionChangeInterceptor(
+        context,
+        requestRetrier: DioConnectivityRequestRetry(
+          dio: dio,
+          connectivity: Connectivity(),
+        ),
+      ),
+      RetryInterceptor(
+          options: RetryOptions(
+            retries: 3,
+            retryInterval: const Duration(seconds: 5),
+            retryEvaluator: (error) =>
+                error.type != DioErrorType.CANCEL &&
+                error.type != DioErrorType.RESPONSE,
+          ),
+          dio: dio)
+    ]);
   }
 }

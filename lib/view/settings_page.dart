@@ -1,8 +1,12 @@
+import 'package:archo/model/user.dart';
 import 'package:archo/provider/home_provider.dart';
 import 'package:archo/util/essentials.dart';
+import 'package:archo/view/colors_page.dart';
+import 'package:archo/view/typography_page.dart';
 import 'package:archo/widget/component/ui_components.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:build_context/build_context.dart';
@@ -13,6 +17,8 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(context) {
+    var homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    print('Settings Executed');
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -142,13 +148,28 @@ class SettingsPage extends StatelessWidget {
             ),
             ListTile(
                 onTap: () async {
-                  await Provider.of<HomeProvider>(context, listen: false)
-                      .init();
+                  await homeProvider.init();
                   showToast("Users updated");
                 },
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 title: Text('Trigger User Api from Home')),
+            Divider(
+              height: 0.5,
+            ),
+            ListTile(
+                onTap: () => Get.toNamed(TypographyPage.routeName),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                title: Text('Typography')),
+            Divider(
+              height: 0.5,
+            ),
+            ListTile(
+                onTap: () => Get.toNamed(ColorsPage.routeName),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                title: Text('Theme Colors')),
             Divider(
               height: 0.5,
             ),

@@ -1,16 +1,15 @@
 import 'package:archo/controller/api.dart';
 import 'package:archo/provider/home_provider.dart';
+import 'package:archo/view/colors_page.dart';
+import 'package:archo/view/typography_page.dart';
 import 'package:archo/widget/no_internet.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_retry/dio_retry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'controller/dio_retry.dart';
 import 'provider/app_provider.dart';
 import 'provider/connectivity_provider.dart';
 import 'util/util.dart';
@@ -40,27 +39,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      dio.interceptors.addAll([
-        dioCacheManager.interceptor,
-        RetryOnConnectionChangeInterceptor(
-          context,
-          requestRetrier: DioConnectivityRequestRetry(
-            dio: dio,
-            connectivity: Connectivity(),
-          ),
-        ),
-        RetryInterceptor(
-            options: RetryOptions(
-              retries: 3,
-              retryInterval: const Duration(seconds: 5),
-              retryEvaluator: (error) =>
-                  error.type != DioErrorType.CANCEL &&
-                  error.type != DioErrorType.RESPONSE,
-            ),
-            dio: dio)
-      ]);
-    });
+    SchedulerBinding.instance
+        .addPostFrameCallback((_) => Util.initDio(context));
   }
 
   @override
@@ -82,19 +62,11 @@ class _MyAppState extends State<MyApp> {
                   theme: box.get("theme", defaultValue: "light") == "light"
                       ? Util.lightTheme
                       : Util.darkTheme,
-                  getPages: [
-                    GetPage(
-                        name: HomePage.routeName,
-                        page: () => HomePage(),
-                        transition: Transition.rightToLeft),
-                    GetPage(
-                        name: SettingsPage.routeName,
-                        page: () => SettingsPage(),
-                        transition: Transition.rightToLeft),
-                  ],
                   routes: {
                     HomePage.routeName: (context) => HomePage(),
                     SettingsPage.routeName: (context) => SettingsPage(),
+                    TypographyPage.routeName: (context) => TypographyPage(),
+                    ColorsPage.routeName: (context) => ColorsPage(),
                   },
                   routingCallback: (routing) {
                     if (!routing.isSnackbar)
