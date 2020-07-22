@@ -30,7 +30,7 @@ class Api {
   static String get baseUrl => 'https://gorest.co.in/';
 
   static String get usersUrl =>
-      'public-api/users?_format=json&access-token=HajwM0zViUmD3bTUu9uEizfyuCIBcKnsmp6H&page=2';
+      'public-api/users?_format=json&access-token=$token&page=2';
 
   static String get anotherUrl => 'api/another_url';
 
